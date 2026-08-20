@@ -12,8 +12,8 @@ class ServicioSupabase {
   static SupabaseClient get cliente {
     if (!_inicializado) {
       throw StateError(
-        'Supabase no esta inicializado. Agrega tus credenciales en '
-        'lib/core/config/configuracion_supabase.dart',
+        'Supabase no esta inicializado. Ejecuta Flutter usando --dart-define '
+        'para SUPABASE_URL y SUPABASE_PUBLISHABLE_KEY.',
       );
     }
 
