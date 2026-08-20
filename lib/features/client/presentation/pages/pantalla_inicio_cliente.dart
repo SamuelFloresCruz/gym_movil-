@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
 
-class ClientHomePage extends StatelessWidget {
-  const ClientHomePage({super.key});
+import '../theme/colores_cliente.dart';
+import '../widgets/tarjeta_estadistica_cliente.dart';
+import '../widgets/titulo_seccion_cliente.dart';
 
-  static const _background = Color(0xFF09090B);
-  static const _surface = Color(0xFF16171B);
-  static const _surfaceSoft = Color(0xFF202126);
-  static const _red = Color(0xFFE53935);
-  static const _redDark = Color(0xFF8F1D1D);
-  static const _textMuted = Color(0xFFA8ABB4);
+class ClientHomePage extends StatelessWidget {
+  const ClientHomePage({
+    super.key,
+    required this.onOpenMuscles,
+    required this.onOpenRoutines,
+    required this.onOpenTracking,
+    required this.onOpenStopwatch,
+  });
+
+  final VoidCallback onOpenMuscles;
+  final VoidCallback onOpenRoutines;
+  final VoidCallback onOpenTracking;
+  final VoidCallback onOpenStopwatch;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: ClientColors.background,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -21,21 +29,26 @@ class ClientHomePage extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  const _Header(),
+                  _Header(onOpenTracking: onOpenTracking),
                   const SizedBox(height: 22),
-                  const _MembershipCard(),
+                  _ActiveRoutineCard(onOpenRoutines: onOpenRoutines),
                   const SizedBox(height: 18),
                   const _ProgressRow(),
                   const SizedBox(height: 24),
-                  _SectionTitle(
+                  ClientSectionTitle(
                     title: 'Accesos rapidos',
-                    actionLabel: 'Ver todo',
-                    onActionTap: () {},
+                    actionLabel: 'Rutinas',
+                    onActionTap: onOpenRoutines,
                   ),
                   const SizedBox(height: 12),
-                  const _ActionGrid(),
+                  _ActionGrid(
+                    onOpenMuscles: onOpenMuscles,
+                    onOpenRoutines: onOpenRoutines,
+                    onOpenTracking: onOpenTracking,
+                    onOpenStopwatch: onOpenStopwatch,
+                  ),
                   const SizedBox(height: 24),
-                  const _TodayWorkoutCard(),
+                  _NextSessionCard(onOpenTracking: onOpenTracking),
                   const SizedBox(height: 24),
                   const _WeeklyRoutinePreview(),
                 ]),
@@ -44,13 +57,14 @@ class ClientHomePage extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: const _BottomBar(),
     );
   }
 }
 
 class _Header extends StatelessWidget {
-  const _Header();
+  const _Header({required this.onOpenTracking});
+
+  final VoidCallback onOpenTracking;
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +75,7 @@ class _Header extends StatelessWidget {
           height: 52,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: ClientHomePage._surface,
+            color: ClientColors.surface,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
           ),
@@ -94,55 +108,57 @@ class _Header extends StatelessWidget {
                 'Listo para entrenar hoy',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: ClientHomePage._textMuted),
+                style: TextStyle(color: ClientColors.textMuted),
               ),
             ],
           ),
         ),
         IconButton.filled(
-          tooltip: 'Notificaciones',
+          tooltip: 'Abrir seguimiento',
           style: IconButton.styleFrom(
-            backgroundColor: ClientHomePage._surface,
+            backgroundColor: ClientColors.surface,
             foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          onPressed: () {},
-          icon: const Icon(Icons.notifications_none),
+          onPressed: onOpenTracking,
+          icon: const Icon(Icons.monitor_heart_outlined),
         ),
       ],
     );
   }
 }
 
-class _MembershipCard extends StatelessWidget {
-  const _MembershipCard();
+class _ActiveRoutineCard extends StatelessWidget {
+  const _ActiveRoutineCard({required this.onOpenRoutines});
+
+  final VoidCallback onOpenRoutines;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: ClientHomePage._red,
+        color: ClientColors.red,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: ClientHomePage._red.withValues(alpha: 0.28),
+            color: ClientColors.red.withValues(alpha: 0.28),
             blurRadius: 28,
             offset: const Offset(0, 14),
           ),
         ],
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
-              Icon(Icons.verified_user_outlined, color: Colors.white),
+              Icon(Icons.fitness_center, color: Colors.white),
               SizedBox(width: 10),
               Text(
-                'Membresia activa',
+                'Rutina activa',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -151,19 +167,35 @@ class _MembershipCard extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 16),
-          Text(
-            'Plan mensual GymPro',
+          const SizedBox(height: 16),
+          const Text(
+            'Fuerza superior',
             style: TextStyle(
               color: Colors.white,
               fontSize: 26,
               fontWeight: FontWeight.w900,
             ),
           ),
-          SizedBox(height: 6),
-          Text(
-            'Vigente hasta el 30/09/2026',
+          const SizedBox(height: 6),
+          const Text(
+            'Pecho, hombro y triceps - 6 ejercicios',
             style: TextStyle(color: Color(0xFFFFE3E3), fontSize: 14),
+          ),
+          const SizedBox(height: 18),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: ClientColors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onPressed: onOpenRoutines,
+              icon: const Icon(Icons.arrow_forward),
+              label: const Text('Ver rutinas'),
+            ),
           ),
         ],
       ),
@@ -179,117 +211,28 @@ class _ProgressRow extends StatelessWidget {
     return const Row(
       children: [
         Expanded(
-          child: _MetricCard(
-            value: '5',
-            label: 'Dias activos',
-            icon: Icons.local_fire_department_outlined,
+          child: ClientStatCard(
+            value: '4',
+            label: 'Rutinas',
+            icon: Icons.assignment_outlined,
           ),
         ),
         SizedBox(width: 12),
         Expanded(
-          child: _MetricCard(
-            value: '12',
+          child: ClientStatCard(
+            value: '18',
             label: 'Ejercicios',
-            icon: Icons.fitness_center,
+            icon: Icons.sports_gymnastics,
+            color: ClientColors.warning,
           ),
         ),
         SizedBox(width: 12),
         Expanded(
-          child: _MetricCard(
+          child: ClientStatCard(
             value: '82%',
-            label: 'Rutina',
+            label: 'Progreso',
             icon: Icons.trending_up,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _MetricCard extends StatelessWidget {
-  const _MetricCard({
-    required this.value,
-    required this.label,
-    required this.icon,
-  });
-
-  final String value;
-  final String label;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 104,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: ClientHomePage._surface,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: ClientHomePage._red, size: 22),
-          const Spacer(),
-          Text(
-            value,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: ClientHomePage._textMuted,
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SectionTitle extends StatelessWidget {
-  const _SectionTitle({
-    required this.title,
-    required this.actionLabel,
-    required this.onActionTap,
-  });
-
-  final String title;
-  final String actionLabel;
-  final VoidCallback onActionTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
-        TextButton(
-          onPressed: onActionTap,
-          child: Text(
-            actionLabel,
-            style: const TextStyle(color: ClientHomePage._red),
+            color: ClientColors.success,
           ),
         ),
       ],
@@ -298,30 +241,44 @@ class _SectionTitle extends StatelessWidget {
 }
 
 class _ActionGrid extends StatelessWidget {
-  const _ActionGrid();
+  const _ActionGrid({
+    required this.onOpenMuscles,
+    required this.onOpenRoutines,
+    required this.onOpenTracking,
+    required this.onOpenStopwatch,
+  });
+
+  final VoidCallback onOpenMuscles;
+  final VoidCallback onOpenRoutines;
+  final VoidCallback onOpenTracking;
+  final VoidCallback onOpenStopwatch;
 
   @override
   Widget build(BuildContext context) {
-    const options = [
+    final options = [
       _ActionOption(
-        title: 'Entrenamiento',
-        subtitle: 'Grupos musculares',
-        icon: Icons.fitness_center,
+        title: 'Musculos',
+        subtitle: 'Ejercicios por grupo',
+        icon: Icons.accessibility_new,
+        onTap: onOpenMuscles,
       ),
       _ActionOption(
-        title: 'Rutina',
-        subtitle: 'Semana actual',
-        icon: Icons.calendar_month_outlined,
+        title: 'Cronometro',
+        subtitle: 'Series y descansos',
+        icon: Icons.timer_outlined,
+        onTap: onOpenStopwatch,
       ),
       _ActionOption(
-        title: 'Perfil',
-        subtitle: 'Datos y membresia',
-        icon: Icons.person_outline,
+        title: 'Semana',
+        subtitle: 'Plan por dias',
+        icon: Icons.view_week_outlined,
+        onTap: onOpenRoutines,
       ),
       _ActionOption(
-        title: 'Soporte',
-        subtitle: 'Contacto rapido',
-        icon: Icons.chat_bubble_outline,
+        title: 'Seguimiento',
+        subtitle: 'Progreso muscular',
+        icon: Icons.monitor_heart_outlined,
+        onTap: onOpenTracking,
       ),
     ];
 
@@ -347,11 +304,13 @@ class _ActionOption {
     required this.title,
     required this.subtitle,
     required this.icon,
+    required this.onTap,
   });
 
   final String title;
   final String subtitle;
   final IconData icon;
+  final VoidCallback onTap;
 }
 
 class _ActionTile extends StatelessWidget {
@@ -362,17 +321,17 @@ class _ActionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: ClientHomePage._surface,
+      color: ClientColors.surface,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         borderRadius: BorderRadius.circular(8),
-        onTap: () {},
+        onTap: option.onTap,
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(option.icon, color: ClientHomePage._red),
+              Icon(option.icon, color: ClientColors.red),
               const Spacer(),
               Text(
                 option.title,
@@ -389,7 +348,7 @@ class _ActionTile extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  color: ClientHomePage._textMuted,
+                  color: ClientColors.textMuted,
                   fontSize: 12,
                 ),
               ),
@@ -401,15 +360,17 @@ class _ActionTile extends StatelessWidget {
   }
 }
 
-class _TodayWorkoutCard extends StatelessWidget {
-  const _TodayWorkoutCard();
+class _NextSessionCard extends StatelessWidget {
+  const _NextSessionCard({required this.onOpenTracking});
+
+  final VoidCallback onOpenTracking;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: ClientHomePage._surface,
+        color: ClientColors.surface,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
@@ -419,7 +380,7 @@ class _TodayWorkoutCard extends StatelessWidget {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: ClientHomePage._redDark,
+              color: ClientColors.redDark,
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(Icons.bolt, color: Colors.white, size: 30),
@@ -430,7 +391,7 @@ class _TodayWorkoutCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Entrenamiento de hoy',
+                  'Proximo entrenamiento',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -441,17 +402,17 @@ class _TodayWorkoutCard extends StatelessWidget {
                 ),
                 SizedBox(height: 6),
                 Text(
-                  'Pecho, hombros y triceps',
+                  'Pierna completa - manana 18:30',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: ClientHomePage._textMuted),
+                  style: TextStyle(color: ClientColors.textMuted),
                 ),
               ],
             ),
           ),
           IconButton(
-            tooltip: 'Abrir entrenamiento',
-            onPressed: () {},
+            tooltip: 'Abrir seguimiento',
+            onPressed: onOpenTracking,
             icon: const Icon(Icons.arrow_forward, color: Colors.white),
           ),
         ],
@@ -477,14 +438,14 @@ class _WeeklyRoutinePreview extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: ClientHomePage._surfaceSoft,
+        color: ClientColors.surfaceSoft,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Rutina semanal',
+            'Semana de entrenamiento',
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -520,7 +481,7 @@ class _DayPill extends StatelessWidget {
       height: 44,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: isDone ? ClientHomePage._red : ClientHomePage._surface,
+        color: isDone ? ClientColors.red : ClientColors.surface,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
       ),
@@ -529,44 +490,10 @@ class _DayPill extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          color: isDone ? Colors.white : ClientHomePage._textMuted,
+          color: isDone ? Colors.white : ClientColors.textMuted,
           fontWeight: FontWeight.w800,
         ),
       ),
-    );
-  }
-}
-
-class _BottomBar extends StatelessWidget {
-  const _BottomBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return NavigationBar(
-      height: 72,
-      backgroundColor: ClientHomePage._surface,
-      indicatorColor: ClientHomePage._red.withValues(alpha: 0.18),
-      selectedIndex: 0,
-      onDestinationSelected: (_) {},
-      destinations: const [
-        NavigationDestination(
-          icon: Icon(Icons.home_outlined),
-          selectedIcon: Icon(Icons.home),
-          label: 'Inicio',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.fitness_center),
-          label: 'Entrenar',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.calendar_month_outlined),
-          label: 'Rutina',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.person_outline),
-          label: 'Perfil',
-        ),
-      ],
     );
   }
 }
