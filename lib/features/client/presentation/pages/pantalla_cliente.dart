@@ -9,14 +9,15 @@ import 'pantalla_rutinas.dart';
 import 'pantalla_seguimiento_muscular.dart';
 
 class ClientShellPage extends StatefulWidget {
-  const ClientShellPage({super.key});
+  const ClientShellPage({super.key, this.onCerrarSesion});
+
+  final Future<void> Function()? onCerrarSesion;
 
   @override
   State<ClientShellPage> createState() => _ClientShellPageState();
 }
 
 class _ClientShellPageState extends State<ClientShellPage> {
-  final _pageController = PageController();
   var _selectedIndex = 0;
   var _isMenuOpen = false;
 
@@ -64,15 +65,10 @@ class _ClientShellPageState extends State<ClientShellPage> {
     const ClientRoutinesPage(),
     const ClientMuscleTrackingPage(),
     const ClientStopwatchPage(),
-    const ClientProfilePage(),
+    ClientProfilePage(onCerrarSesion: widget.onCerrarSesion),
   ];
 
   void _selectPage(int index) {
-    _pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 260),
-      curve: Curves.easeOutCubic,
-    );
     setState(() {
       _selectedIndex = index;
       _isMenuOpen = false;
@@ -92,12 +88,6 @@ class _ClientShellPageState extends State<ClientShellPage> {
   }
 
   @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ClientColors.background,
@@ -105,15 +95,7 @@ class _ClientShellPageState extends State<ClientShellPage> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 52),
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _selectedIndex = index;
-                });
-              },
-              children: _pages,
-            ),
+            child: IndexedStack(index: _selectedIndex, children: _pages),
           ),
           _ClientTopNavigation(
             items: _navigationItems,

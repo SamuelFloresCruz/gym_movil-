@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'core/servicios/servicio_supabase.dart';
 import 'features/auth/presentation/pages/puerta_autenticacion.dart';
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  await ServicioSupabase.inicializar();
-
   runApp(const GymProApp());
 }
 

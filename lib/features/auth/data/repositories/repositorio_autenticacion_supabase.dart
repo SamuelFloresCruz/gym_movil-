@@ -1,4 +1,4 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase/supabase.dart';
 
 import '../../../../core/servicios/servicio_supabase.dart';
 import '../../domain/entities/usuario_autenticado.dart';
@@ -18,7 +18,7 @@ class RepositorioAutenticacionSupabase {
       return null;
     }
 
-    return _obtenerPerfil(usuario.id, usuario.email ?? '');
+    return _obtenerPerfil(usuario);
   }
 
   Future<UsuarioAutenticado> iniciarSesion({
@@ -35,7 +35,7 @@ class RepositorioAutenticacionSupabase {
       throw const AuthException('No se pudo iniciar sesion.');
     }
 
-    return _obtenerPerfil(usuario.id, usuario.email ?? correo);
+    return _obtenerPerfil(usuario);
   }
 
   Future<void> cerrarSesion() async {
@@ -46,23 +46,42 @@ class RepositorioAutenticacionSupabase {
     await _cliente.auth.signOut();
   }
 
-  Future<UsuarioAutenticado> _obtenerPerfil(
-    String usuarioId,
-    String correo,
-  ) async {
-    final perfil = await _cliente
-        .from('perfiles')
-        .select('id, id_publico, nombre_completo, correo, rol')
-        .eq('id', usuarioId)
-        .single();
+  Future<UsuarioAutenticado> _obtenerPerfil(User usuario) async {
+    final correo = usuario.email ?? '';
+
+    try {
+      final perfil = await _cliente
+          .from('perfiles')
+          .select('id, id_publico, nombre_completo, correo, rol')
+          .eq('id', usuario.id)
+          .maybeSingle();
+
+      if (perfil != null) {
+        return UsuarioAutenticado(
+          id: perfil['id'] as String,
+          correo: (perfil['correo'] as String?) ?? correo,
+          nombreCompleto:
+              (perfil['nombre_completo'] as String?) ?? 'Usuario GymPro',
+          rol: (perfil['rol'] as String?) ?? _rolDesdeMetadata(usuario),
+          idPublico: (perfil['id_publico'] as String?) ?? '',
+        );
+      }
+    } catch (_) {
+      // Si RLS aun no permite leer perfiles, usamos la metadata segura de Auth.
+    }
 
     return UsuarioAutenticado(
-      id: perfil['id'] as String,
-      correo: (perfil['correo'] as String?) ?? correo,
+      id: usuario.id,
+      correo: correo,
       nombreCompleto:
-          (perfil['nombre_completo'] as String?) ?? 'Usuario GymPro',
-      rol: (perfil['rol'] as String?) ?? 'usuario',
-      idPublico: (perfil['id_publico'] as String?) ?? '',
+          (usuario.userMetadata?['nombre_completo'] as String?) ??
+          'Usuario GymPro',
+      rol: _rolDesdeMetadata(usuario),
+      idPublico: '',
     );
+  }
+
+  String _rolDesdeMetadata(User usuario) {
+    return (usuario.appMetadata['rol'] as String?) ?? 'usuario';
   }
 }

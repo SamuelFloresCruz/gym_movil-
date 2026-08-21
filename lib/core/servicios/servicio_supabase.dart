@@ -1,13 +1,16 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase/supabase.dart';
 
 import '../config/configuracion_supabase.dart';
 
 class ServicioSupabase {
   const ServicioSupabase._();
 
+  static SupabaseClient? _cliente;
   static var _inicializado = false;
+  static String? _errorInicializacion;
 
   static bool get estaInicializado => _inicializado;
+  static String? get errorInicializacion => _errorInicializacion;
 
   static SupabaseClient get cliente {
     if (!_inicializado) {
@@ -17,19 +20,29 @@ class ServicioSupabase {
       );
     }
 
-    return Supabase.instance.client;
+    return _cliente!;
   }
 
   static Future<void> inicializar() async {
+    if (_inicializado) {
+      return;
+    }
+
     if (!ConfiguracionSupabase.estaConfigurado) {
       return;
     }
 
-    await Supabase.initialize(
-      url: ConfiguracionSupabase.url,
-      publishableKey: ConfiguracionSupabase.clavePublica,
-    );
-
-    _inicializado = true;
+    try {
+      _cliente = SupabaseClient(
+        ConfiguracionSupabase.url,
+        ConfiguracionSupabase.clavePublica,
+      );
+      _inicializado = true;
+      _errorInicializacion = null;
+    } catch (error) {
+      _cliente = null;
+      _inicializado = false;
+      _errorInicializacion = error.toString();
+    }
   }
 }

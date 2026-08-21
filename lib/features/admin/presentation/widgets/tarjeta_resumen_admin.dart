@@ -19,7 +19,7 @@ class TarjetaResumenAdmin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: ClientColors.surface,
         borderRadius: BorderRadius.circular(8),
@@ -29,26 +29,27 @@ class TarjetaResumenAdmin extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 38,
-            height: 38,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.16),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icono, color: color, size: 20),
+            child: Icon(icono, color: color, size: 19),
           ),
-          const Spacer(),
+          const SizedBox(height: 14),
           Text(
             valor,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 26,
+              fontSize: 24,
               fontWeight: FontWeight.w900,
+              height: 1,
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 8),
           Text(
             titulo,
             maxLines: 1,
@@ -57,6 +58,7 @@ class TarjetaResumenAdmin extends StatelessWidget {
               color: ClientColors.textMuted,
               fontSize: 12,
               fontWeight: FontWeight.w700,
+              height: 1.1,
             ),
           ),
         ],

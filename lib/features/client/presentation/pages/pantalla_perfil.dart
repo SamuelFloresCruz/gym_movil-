@@ -6,7 +6,9 @@ import '../widgets/tarjeta_estadistica_cliente.dart';
 import '../widgets/titulo_seccion_cliente.dart';
 
 class ClientProfilePage extends StatefulWidget {
-  const ClientProfilePage({super.key});
+  const ClientProfilePage({super.key, this.onCerrarSesion});
+
+  final Future<void> Function()? onCerrarSesion;
 
   @override
   State<ClientProfilePage> createState() => _ClientProfilePageState();
@@ -31,7 +33,7 @@ class _ClientProfilePageState extends State<ClientProfilePage> {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         const SnackBar(
-          content: Text('ID copiado al portapapeles.'),
+          content: Text('Codigo copiado al portapapeles.'),
           behavior: SnackBarBehavior.floating,
           backgroundColor: ClientColors.surfaceSoft,
         ),
@@ -105,7 +107,7 @@ class _ClientProfilePageState extends State<ClientProfilePage> {
                   const SizedBox(height: 12),
                   _ProfileOptionTile(
                     icon: Icons.badge_outlined,
-                    title: 'ID de usuario',
+                    title: 'Codigo de cuenta',
                     subtitle: _userId,
                     trailingIcon: Icons.copy_outlined,
                     onTap: _copyUserId,
@@ -114,7 +116,7 @@ class _ClientProfilePageState extends State<ClientProfilePage> {
                   const _ProfileOptionTile(
                     icon: Icons.lock_outline,
                     title: 'Seguridad',
-                    subtitle: 'Contrasena y acceso',
+                    subtitle: 'Clave y acceso',
                     trailingIcon: Icons.chevron_right,
                   ),
                   const SizedBox(height: 10),
@@ -123,6 +125,14 @@ class _ClientProfilePageState extends State<ClientProfilePage> {
                     title: 'Preferencias',
                     subtitle: 'Tema, idioma y unidades',
                     trailingIcon: Icons.chevron_right,
+                  ),
+                  const SizedBox(height: 10),
+                  _ProfileOptionTile(
+                    icon: Icons.logout,
+                    title: 'Cerrar sesion',
+                    subtitle: 'Salir de esta cuenta',
+                    trailingIcon: Icons.chevron_right,
+                    onTap: () => widget.onCerrarSesion?.call(),
                   ),
                 ]),
               ),
@@ -271,7 +281,7 @@ class _UserCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            'ID para compartir rutinas',
+                            'Codigo personal',
                             style: TextStyle(
                               color: ClientColors.textMuted,
                               fontSize: 12,
@@ -451,7 +461,7 @@ class _ProgressSummary extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           const Text(
-            '4 rutinas completadas de 5 programadas esta semana.',
+            '4 de 5 sesiones completadas esta semana.',
             style: TextStyle(color: ClientColors.textMuted, height: 1.35),
           ),
         ],

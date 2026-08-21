@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../admin/presentation/pages/pantalla_inicio_admin.dart';
 import '../../../client/presentation/pages/pantalla_cliente.dart';
 import '../../../client/presentation/theme/colores_cliente.dart';
+import '../../../../core/servicios/servicio_supabase.dart';
 import '../../data/repositories/repositorio_autenticacion_supabase.dart';
 import '../../domain/entities/usuario_autenticado.dart';
 import 'pantalla_login.dart';
@@ -22,7 +23,12 @@ class _PuertaAutenticacionState extends State<PuertaAutenticacion> {
   @override
   void initState() {
     super.initState();
-    _usuarioInicial = _repositorio.obtenerUsuarioActual();
+    _usuarioInicial = _prepararSesion();
+  }
+
+  Future<UsuarioAutenticado?> _prepararSesion() async {
+    await ServicioSupabase.inicializar();
+    return _repositorio.obtenerUsuarioActual();
   }
 
   void _actualizarSesion(UsuarioAutenticado usuario) {
@@ -50,7 +56,7 @@ class _PuertaAutenticacionState extends State<PuertaAutenticacion> {
       );
     }
 
-    return const ClientShellPage();
+    return ClientShellPage(onCerrarSesion: _cerrarSesion);
   }
 
   @override

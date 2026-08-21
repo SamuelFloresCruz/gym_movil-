@@ -87,6 +87,31 @@ function New-AuthUser {
   }
 }
 
+function Update-AuthUserMetadata {
+  param(
+    [string]$BaseUrl,
+    [hashtable]$Headers,
+    [string]$UserId,
+    [string]$Rol,
+    [string]$Nombre
+  )
+
+  $body = @{
+    app_metadata = @{
+      rol = $Rol
+    }
+    user_metadata = @{
+      nombre_completo = $Nombre
+    }
+  } | ConvertTo-Json -Depth 5
+
+  Invoke-RestMethod `
+    -Method Put `
+    -Uri "$BaseUrl/auth/v1/admin/users/$UserId" `
+    -Headers $Headers `
+    -Body $body | Out-Null
+}
+
 function Get-PublicId {
   param(
     [string]$BaseUrl,
@@ -170,6 +195,13 @@ $admin = New-AuthUser `
   -Password $Contrasena `
   -Nombre "Administrador GymPro"
 
+Update-AuthUserMetadata `
+  -BaseUrl $baseUrl `
+  -Headers $headers `
+  -UserId $admin.id `
+  -Rol "administrador" `
+  -Nombre "Administrador GymPro"
+
 Update-Profile `
   -BaseUrl $baseUrl `
   -Headers $headers `
@@ -183,6 +215,13 @@ $usuario = New-AuthUser `
   -Headers $headers `
   -Email $CorreoUsuario `
   -Password $Contrasena `
+  -Nombre "Usuario GymPro"
+
+Update-AuthUserMetadata `
+  -BaseUrl $baseUrl `
+  -Headers $headers `
+  -UserId $usuario.id `
+  -Rol "usuario" `
   -Nombre "Usuario GymPro"
 
 Update-Profile `
